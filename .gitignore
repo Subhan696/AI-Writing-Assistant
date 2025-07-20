@@ -12,7 +12,7 @@
 /frontend/.env.production.local
 /frontend/npm-debug.log*
 
-# Common
+
 *.log
 .DS_Store
 Thumbs.db
