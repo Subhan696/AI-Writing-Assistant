@@ -130,21 +130,14 @@ app.post('/api/generate', auth, usageLimit, async (req, res) => {
   const { prompt } = req.body;
   try {
     const response = await axios.post(
-      'https://api.openai.com/v1/completions',
+      'http://localhost:11434/api/generate',
       {
-        model: 'text-davinci-003',
+        model: 'llama2',
         prompt,
-        max_tokens: 150,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
+        stream: false
       }
     );
-
-    const generatedText = response.data.choices[0].text.trim();
+    const generatedText = response.data.response;
 
     const historyEntry = new History({
       user: req.user.id,

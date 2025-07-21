@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.0",
