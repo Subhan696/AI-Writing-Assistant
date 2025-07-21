@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
+const History = require('./models/History');
+const axios = require('axios');
 
 const app = express();
 app.use(express.json());
@@ -89,6 +91,86 @@ const auth = (req, res, next) => {
 app.get('/api/protected', auth, (req, res) => {
   res.json({ msg: 'This is a protected route', user: req.user });
 });
+
+// Usage limit middleware
+const usageLimit = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    if (user.isPro) {
+      return next(); // Pro users have unlimited usage
+    }
+
+    const today = new Date().setHours(0, 0, 0, 0);
+    const lastUsed = user.lastUsedDate ? new Date(user.lastUsedDate).setHours(0, 0, 0, 0) : null;
+
+    if (lastUsed !== today) {
+      user.dailyUsageCount = 0;
+    }
+
+    if (user.dailyUsageCount >= 5) { // 5 is the daily limit for free users
+      return res.status(429).json({ msg: 'Daily usage limit reached' });
+    }
+
+    user.dailyUsageCount += 1;
+    user.lastUsedDate = new Date();
+    await user.save();
+
+    next();
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+// Generate text route
+app.post('/api/generate', auth, usageLimit, async (req, res) => {
+  const { prompt } = req.body;
+  try {
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        model: 'text-davinci-003',
+        prompt,
+        max_tokens: 150,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+      }
+    );
+
+    const generatedText = response.data.choices[0].text.trim();
+
+    const historyEntry = new History({
+      user: req.user.id,
+      prompt,
+      response: generatedText,
+    });
+    await historyEntry.save();
+
+    res.json({ generatedText });
+  } catch (err) {
+    console.error('OpenAI API error:', err.response ? err.response.data : err.message);
+    res.status(500).send('Error generating text');
+  }
+});
+
+// History route
+app.get('/api/history', auth, async (req, res) => {
+  try {
+    const history = await History.find({ user: req.user.id }).sort({ timestamp: -1 });
+    res.json(history);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 
 // Placeholder route
 app.get('/', (req, res) => {

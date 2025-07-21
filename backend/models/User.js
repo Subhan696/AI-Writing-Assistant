@@ -10,6 +10,18 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isPro: {
+    type: Boolean,
+    default: false,
+  },
+  lastUsedDate: {
+    type: Date,
+    default: null,
+  },
+  dailyUsageCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model('User', UserSchema); 
