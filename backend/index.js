@@ -110,7 +110,7 @@ const usageLimit = async (req, res, next) => {
       user.dailyUsageCount = 0;
     }
 
-    if (user.dailyUsageCount >= 20) { // 5 is the daily limit for free users
+    if (user.dailyUsageCount >= 5) { // 5 is the daily limit for free users
       return res.status(429).json({ msg: 'Daily usage limit reached' });
     }
 
@@ -156,7 +156,7 @@ const generatedText = response.data.choices[0].message.content;
 
     res.json({ generatedText });
   } catch (err) {
-    console.error('OpenAI API error:', err.response ? err.response.data : err.message);
+    console.error('GROQ API error:', err.response ? err.response.data : err.message);
     res.status(500).send('Error generating text');
   }
 });
