@@ -110,7 +110,7 @@ const usageLimit = async (req, res, next) => {
       user.dailyUsageCount = 0;
     }
 
-    if (user.dailyUsageCount >= 5) { // 5 is the daily limit for free users
+    if (user.dailyUsageCount >= 20) { // 5 is the daily limit for free users
       return res.status(429).json({ msg: 'Daily usage limit reached' });
     }
 
@@ -129,15 +129,23 @@ const usageLimit = async (req, res, next) => {
 app.post('/api/generate', auth, usageLimit, async (req, res) => {
   const { prompt } = req.body;
   try {
-    const response = await axios.post(
-      'http://localhost:11434/api/generate',
-      {
-        model: 'llama2',
-        prompt,
-        stream: false
-      }
-    );
-    const generatedText = response.data.response;
+const response = await axios.post(
+  'https://api.groq.com/openai/v1/chat/completions',
+  {
+    model: 'llama3-8b-8192',
+    messages: [
+      { role: 'user', content: prompt }
+    ],
+    max_tokens: 150
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+    }
+  }
+);
+const generatedText = response.data.choices[0].message.content;
 
     const historyEntry = new History({
       user: req.user.id,
