@@ -5,6 +5,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Editor from './components/Editor/Editor';
 import History from './components/History/History';
+import SharePage from './components/SharePage/SharePage';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Navbar from './components/Navbar/Navbar';
 import './App.css';
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/share/:id" element={<SharePage />} />
             <Route
               path="/"
               element={<PrivateRoute><Editor /></PrivateRoute>}

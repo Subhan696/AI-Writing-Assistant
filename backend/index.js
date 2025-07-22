@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
 const History = require('./models/History');
+const Share = require('./models/Share');
 const axios = require('axios');
 
 const app = express();
@@ -172,6 +173,33 @@ app.get('/api/history', auth, async (req, res) => {
   try {
     const history = await History.find({ user: req.user.id }).sort({ timestamp: -1 });
     res.json(history);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+
+// Create shareable link
+app.post('/api/share', async (req, res) => {
+  try {
+    const newShare = new Share({ content: req.body.content });
+    await newShare.save();
+    res.json({ shareId: newShare._id });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Get shared content
+app.get('/api/share/:id', async (req, res) => {
+  try {
+    const share = await Share.findById(req.params.id);
+    if (!share) {
+      return res.status(404).json({ msg: 'Content not found' });
+    }
+    res.json(share);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

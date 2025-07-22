@@ -113,3 +113,43 @@
   background-color: #f0f0f0;
 }
 
+.copy-success {
+  margin-left: 1rem;
+  color: #28a745;
+  font-weight: bold;
+}
+
+.shareable-link-container {
+  margin-top: 1.5rem;
+}
+
+.shareable-link-container p {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.share-link-input {
+  display: flex;
+}
+
+.share-link-input input {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+}
+
+.share-link-input button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.share-link-input button:hover {
+  background-color: #0056b3;
+}
+
