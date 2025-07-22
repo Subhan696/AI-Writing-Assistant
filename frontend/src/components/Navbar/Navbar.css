@@ -30,3 +30,27 @@
 .navbar a:hover {
   color: #007bff;
 }
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+}
+
+.user-status {
+  display: flex;
+  align-items: center;
+  margin-right: 2rem;
+}
+
+.user-status span {
+  margin-right: 1rem;
+}
+
+.pro-badge {
+  background-color: #28a745;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
