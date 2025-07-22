@@ -11,12 +11,22 @@ const Editor = () => {
     setIsLoading(true);
     setSuggestions([]);
     try {
-      const res = await axios.post('/api/generate', { text, type });
-      setSuggestions(res.data.suggestions);
+      const prompt = type === 'rephrase' 
+        ? `Rephrase the following text: "${text}"` 
+        : text;
+
+      const res = await axios.post('/api/generate', { prompt });
+      // The backend returns a single string, so we wrap it in an array
+      setSuggestions([res.data.generatedText]);
     } catch (err) {
-      console.error(err);
+      console.error('Error generating text:', err);
     }
     setIsLoading(false);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setText(prevText => `${prevText} ${suggestion}`.trim());
+    setSuggestions([]);
   };
 
   return (
@@ -28,10 +38,10 @@ const Editor = () => {
         placeholder="Start writing..."
       />
       <div className="editor-buttons">
-        <button onClick={() => handleGeneration('generate')} disabled={isLoading}>
+        <button onClick={() => handleGeneration('generate')} disabled={isLoading || !text}>
           Generate Next Line
         </button>
-        <button onClick={() => handleGeneration('rephrase')} disabled={isLoading}>
+        <button onClick={() => handleGeneration('rephrase')} disabled={isLoading || !text}>
           Rephrase
         </button>
       </div>
@@ -45,7 +55,9 @@ const Editor = () => {
           <h3>Suggestions</h3>
           <ul>
             {suggestions.map((s, i) => (
-              <li key={i}>{s}</li>
+              <li key={i} onClick={() => handleSuggestionClick(s)}>
+                {s}
+              </li>
             ))}
           </ul>
         </div>

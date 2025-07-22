@@ -87,9 +87,15 @@ const auth = (req, res, next) => {
   }
 };
 
-// Protected route
-app.get('/api/protected', auth, (req, res) => {
-  res.json({ msg: 'This is a protected route', user: req.user });
+// Get authenticated user
+app.get('/api/auth', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
 });
 
 // Usage limit middleware

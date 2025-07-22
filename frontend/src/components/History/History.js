@@ -33,9 +33,14 @@ const History = () => {
         <ul className="history-list">
           {history.map((item) => (
             <li key={item._id} className="history-item">
-              <p>{item.text}</p>
+              <div className="history-item-content">
+                <strong>Prompt:</strong>
+                <p>{item.prompt}</p>
+                <strong>Response:</strong>
+                <p>{item.response}</p>
+              </div>
               <span className="history-date">
-                {new Date(item.createdAt).toLocaleString()}
+                {new Date(item.timestamp).toLocaleString()}
               </span>
             </li>
           ))}
