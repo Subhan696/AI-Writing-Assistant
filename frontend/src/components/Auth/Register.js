@@ -11,6 +11,7 @@ const Register = () => {
     email: '',
     password: '',
   });
+  const [error, setError] = useState('');
 
   const { name, email, password } = formData;
 
@@ -23,42 +24,55 @@ const Register = () => {
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    register(formData);
+    try {
+      await register(formData);
+    } catch (err) {
+      setError(err.response.data.msg || 'Registration failed');
+      setTimeout(() => setError(''), 5000);
+    }
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <div className="form-container">
       <h2>Register</h2>
-      <input
-        type="text"
-        placeholder="Name"
-        name="name"
-        value={name}
-        onChange={onChange}
-        required
-      />
-      <input
-        type="email"
-        placeholder="Email Address"
-        name="email"
-        value={email}
-        onChange={onChange}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        name="password"
-        value={password}
-        onChange={onChange}
-        required
-      />
-      <input type="submit" value="Register" />
-    </form>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <form onSubmit={onSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            name="name"
+            value={name}
+            onChange={onChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="email">Email Address</label>
+          <input
+            type="email"
+            name="email"
+            value={email}
+            onChange={onChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            value={password}
+            onChange={onChange}
+            required
+          />
+        </div>
+        <input type="submit" value="Register" className="btn btn-primary" />
+      </form>
+    </div>
   );
 };
 
 export default Register;
-

@@ -153,3 +153,18 @@
   background-color: #0056b3;
 }
 
+@media (max-width: 768px) {
+  .buttons-container {
+    flex-direction: column;
+  }
+
+  .buttons-container button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .buttons-container button:last-child {
+    margin-bottom: 0;
+  }
+}
+
