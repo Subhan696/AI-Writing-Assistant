@@ -1,8 +1,11 @@
 {
   "dependencies": {
+    "@fontsource/inter": "^5.2.6",
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
-    "jsonwebtoken": "^9.0.2"
+    "framer-motion": "^12.23.6",
+    "jsonwebtoken": "^9.0.2",
+    "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
     "jest": "^30.0.4",
