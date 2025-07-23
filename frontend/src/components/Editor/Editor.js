@@ -6,10 +6,16 @@ import { FiCopy, FiDownload, FiShare2, FiRotateCw, FiZap, FiEdit2, FiCheck } fro
 import { AuthContext } from '../../context/AuthContext';
 import { generateAPI, shareAPI } from '../../services/api';
 import { useUsage } from '../../hooks/useUsage';
-import { Button } from '../ui/Button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/Card';
-import { Textarea } from '../ui/Textarea';
-import { Loading } from '../ui/Loading';
+import Button from '../ui/Button';
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardContent, 
+  CardFooter 
+} from '../ui/Card';
+import Textarea from '../ui/Textarea';
+import Loading from '../ui/Loading';
 import SuggestionItem from './SuggestionItem';
 import { toast } from 'react-hot-toast';
 import './Editor.css';

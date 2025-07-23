@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiCopy, FiDownload, FiShare2, FiCheck, FiEdit2 } from 'react-icons/fi';
-import { Button } from '../ui/Button';
+import Button from '../ui/Button';
 
 const SuggestionItem = ({ 
   suggestion, 

@@ -11,27 +11,36 @@ import Navbar from './components/Navbar/Navbar';
 import { useRealtimeSync } from './hooks/useRealtimeSync';
 import './App.css';
 
-function App() {
+// Wrapper component to use the useRealtimeSync hook
+const AppContent = () => {
   useRealtimeSync();
+  return (
+    <>
+      <Navbar />
+      <div className="container">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/share/:id" element={<SharePage />} />
+          <Route
+            path="/"
+            element={<PrivateRoute><Editor /></PrivateRoute>}
+          />
+          <Route
+            path="/history"
+            element={<PrivateRoute><History /></PrivateRoute>}
+          />
+        </Routes>
+      </div>
+    </>
+  );
+};
+
+function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
-        <div className="container">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/share/:id" element={<SharePage />} />
-            <Route
-              path="/"
-              element={<PrivateRoute><Editor /></PrivateRoute>}
-            />
-            <Route
-              path="/history"
-              element={<PrivateRoute><History /></PrivateRoute>}
-            />
-          </Routes>
-        </div>
+        <AppContent />
       </Router>
     </AuthProvider>
   );
