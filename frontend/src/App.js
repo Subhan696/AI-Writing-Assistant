@@ -8,9 +8,11 @@ import History from './components/History/History';
 import SharePage from './components/SharePage/SharePage';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Navbar from './components/Navbar/Navbar';
+import { useRealtimeSync } from './hooks/useRealtimeSync';
 import './App.css';
 
 function App() {
+  useRealtimeSync();
   return (
     <AuthProvider>
       <Router>

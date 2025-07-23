@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useContext } from 'react';
 import { Document, Packer, Paragraph } from 'docx';
 import { saveAs } from 'file-saver';
+import { AuthContext } from '../../context/AuthContext';
+import { handleSuccess } from '../../utils/errorHandler';
+import { generateAPI, shareAPI } from '../../services/api';
+import { useUsage } from '../../hooks/useUsage';
 import './Editor.css';
 
 const Editor = () => {
@@ -10,23 +13,39 @@ const Editor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [copySuccess, setCopySuccess] = useState('');
   const [shareableLink, setShareableLink] = useState('');
+  const [error, setError] = useState(null);
+  const { user, refreshUser } = useContext(AuthContext);
+  const { currentUsage, maxUsage, isPro, usagePercentage, remaining, usageBarClass } = useUsage();
 
-  const handleGeneration = async (type) => {
-    setIsLoading(true);
-    setSuggestions([]);
-    try {
-      const prompt = type === 'rephrase' 
-        ? `Rephrase the following text: "${text}"` 
-        : text;
+const handleGeneration = async (type) => {
+  if (!text.trim()) {
+    setError('Please enter some text first');
+    return;
+  }
 
-      const res = await axios.post('/api/generate', { prompt });
-      // The backend returns a single string, so we wrap it in an array
-      setSuggestions([res.data.generatedText]);
-    } catch (err) {
-      console.error('Error generating text:', err);
-    }
+  setIsLoading(true);
+  setError(null);
+  setSuggestions([]);
+
+  try {
+    const prompt = type === 'rephrase' 
+      ? `Rephrase the following text: "${text}"` 
+      : text;
+
+    const response = await generateAPI.generateText(prompt);
+    setSuggestions([response.data.generatedText]);
+    handleSuccess('Text generated successfully!');
+    
+    // Refresh user data to update usage count
+    await refreshUser();
+  } catch (err) {
+    const errorMsg = err.response?.data?.msg || 'Error generating text. Please try again.';
+    setError(errorMsg);
+    console.error('Error generating text:', err);
+  } finally {
     setIsLoading(false);
-  };
+  }
+};
 
   const handleSuggestionClick = (suggestion) => {
     setText(prevText => `${prevText} ${suggestion}`.trim());
@@ -70,18 +89,51 @@ const Editor = () => {
   };
 
   const handleShare = async () => {
+    if (!text.trim()) {
+      setError('Please enter some text to share');
+      return;
+    }
+
     try {
-      const res = await axios.post('/api/share', { content: text });
-      const { shareId } = res.data;
+      setIsLoading(true);
+      const response = await shareAPI.createShare(text);
+      const { shareId } = response.data;
       const link = `${window.location.origin}/share/${shareId}`;
       setShareableLink(link);
+      handleSuccess('Shareable link created!');
     } catch (err) {
+      const errorMsg = handleApiError(err);
+      setError(errorMsg);
       console.error('Error creating shareable link:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const clearError = () => setError(null);
+
   return (
     <div className="editor-container">
+      {error && (
+        <div className="error-message">
+          {error}
+          <button onClick={clearError} className="close-error">×</button>
+        </div>
+      )}
+      {!isPro && (
+        <div className="usage-info">
+          <div className="usage-bar">
+            <div 
+              className={`usage-bar-fill ${usageBarClass}`} 
+              style={{ width: `${usagePercentage}%` }}
+            ></div>
+          </div>
+          <div className="usage-text">
+            <span>Usage: {currentUsage}/{maxUsage}</span>
+            <span>{remaining} {remaining === 1 ? 'use' : 'uses'} remaining</span>
+          </div>
+        </div>
+      )}
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
