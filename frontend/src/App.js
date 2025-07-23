@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Editor from './components/Editor/Editor';
@@ -39,9 +40,13 @@ const AppContent = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <ThemeProvider>
+        <Router>
+          <div className="min-h-screen flex flex-col">
+            <AppContent />
+          </div>
+        </Router>
+      </ThemeProvider>
     </AuthProvider>
   );
 }
