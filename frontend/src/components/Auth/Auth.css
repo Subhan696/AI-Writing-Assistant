@@ -1,0 +1,118 @@
+/* Auth Container */
+.auth-container {
+  @apply min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4;
+}
+
+.dark .auth-container {
+  @apply bg-gradient-to-br from-gray-900 to-gray-800;
+}
+
+/* Form Container */
+.form-container {
+  @apply w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-xl;
+}
+
+/* Form Header */
+.form-header {
+  @apply text-center;
+}
+
+.form-header h2 {
+  @apply text-3xl font-bold text-gray-900 mb-2;
+}
+
+.form-header p {
+  @apply text-gray-600;
+}
+
+/* Form Group */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-group label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.form-group input {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200;
+}
+
+/* Form Footer */
+.form-footer {
+  @apply text-center text-sm text-gray-600;
+}
+
+.form-footer a {
+  @apply text-blue-600 hover:text-blue-800 font-medium;
+}
+
+/* Button */
+.btn-primary {
+  @apply w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200;
+}
+
+/* Error Message */
+.alert {
+  @apply p-3 rounded-md text-sm mb-4;
+}
+
+.alert-danger {
+  @apply bg-red-50 text-red-700 border border-red-200;
+}
+
+/* Divider */
+.divider {
+  @apply relative my-6;
+}
+
+.divider::before {
+  @apply absolute top-1/2 left-0 right-0 h-px bg-gray-200 -translate-y-1/2;
+  content: '';
+}
+
+.divider span {
+  @apply relative px-3 bg-white text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400;
+}
+
+/* Social Buttons */
+.social-buttons {
+  @apply space-y-3;
+}
+
+.social-btn {
+  @apply w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200;
+}
+
+.social-btn svg {
+  @apply h-5 w-5 mr-2;
+}
+
+/* Dark Mode */
+.dark .form-container {
+  @apply bg-gray-800 border border-gray-700;
+}
+
+.dark .form-header h2 {
+  @apply text-white;
+}
+
+.dark .form-header p {
+  @apply text-gray-300;
+}
+
+.dark .form-group label {
+  @apply text-gray-300;
+}
+
+.dark .form-group input {
+  @apply bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-blue-500;
+}
+
+.dark .form-footer {
+  @apply text-gray-400;
+}
+
+.dark .social-btn {
+  @apply bg-gray-700 border-gray-600 text-white hover:bg-gray-600;
+}
