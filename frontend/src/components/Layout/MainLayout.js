@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FiMenu, FiChevronLeft, FiMessageSquare, FiPlus } from 'react-icons/fi';
+import { FiMenu, FiMessageSquare, FiPlus } from 'react-icons/fi';
 import { cn } from '../../lib/utils';
 import './MainLayout.css';
 
-const MainLayout = ({ historyComponent, chatComponent, onNewChat }) => {
+const MainLayout = ({ historyComponent, chatComponent, onNewChat, onHistoryItemClick }) => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -51,6 +51,16 @@ const MainLayout = ({ historyComponent, chatComponent, onNewChat }) => {
     }
   };
 
+  // Handle history item click
+  const handleHistoryItemClick = (chatId) => {
+    if (typeof onHistoryItemClick === 'function') {
+      onHistoryItemClick(chatId);
+    }
+    if (isMobile) {
+      setIsHistoryOpen(false);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden relative">
       {/* Sidebar */}
@@ -73,17 +83,21 @@ const MainLayout = ({ historyComponent, chatComponent, onNewChat }) => {
               <span>New chat</span>
             </button>
           </div>
-          <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-2">Recent</h3>
-            <div className="space-y-1">
-              {historyComponent}
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-2">Recent</h3>
+              <div className="space-y-1">
+                {React.cloneElement(historyComponent, {
+                  ...(historyComponent.props.onItemClick ? {} : { onItemClick: handleHistoryItemClick })
+                })}
+              </div>
             </div>
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className={`flex-1 flex flex-col h-full transition-all duration-300 w-full`}>
+      {/* Main Content - Takes full width */}
+      <div className="flex-1 flex flex-col h-full w-full overflow-hidden">
         {/* Header */}
         <header className="h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center px-4 sticky top-0 z-10">
           <button 

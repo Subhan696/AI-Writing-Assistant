@@ -18,10 +18,19 @@ import './App.css';
 const AppContent = () => {
   useRealtimeSync();
   const [chatKey, setChatKey] = React.useState(0);
+  const [currentChatId, setCurrentChatId] = React.useState(null);
   
   // Handle new chat creation
   const handleNewChat = () => {
+    setCurrentChatId(null);
     // Force remount the Chat component with a new key
+    setChatKey(prevKey => prevKey + 1);
+  };
+  
+  // Handle clicking on a chat history item
+  const handleHistoryItemClick = (chatId) => {
+    setCurrentChatId(chatId);
+    // Force remount the Chat component with the selected chat
     setChatKey(prevKey => prevKey + 1);
   };
   
@@ -29,8 +38,13 @@ const AppContent = () => {
   const MainApp = () => (
     <MainLayout
       key={chatKey}
-      chatComponent={<Chat key={chatKey} />}
-      historyComponent={<History onNewChat={handleNewChat} />}
+      chatComponent={<Chat key={chatKey} chatId={currentChatId} />}
+      historyComponent={
+        <History 
+          onNewChat={handleNewChat} 
+          onItemClick={handleHistoryItemClick}
+        />
+      }
       onNewChat={handleNewChat}
     />
   );
@@ -38,7 +52,7 @@ const AppContent = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-6">
+      <div className="flex-1 flex flex-col w-full">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

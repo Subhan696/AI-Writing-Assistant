@@ -152,13 +152,35 @@ const generatedText = response.data.choices[0].message.content;
   }
 });
 
-// History route
+// Get all history for the authenticated user
 app.get('/api/history', auth, async (req, res) => {
   try {
     const history = await History.find({ user: req.user.id }).sort({ timestamp: -1 });
     res.json(history);
   } catch (err) {
     console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Get a single history item by ID
+app.get('/api/history/:id', auth, async (req, res) => {
+  try {
+    const historyItem = await History.findOne({ 
+      _id: req.params.id,
+      user: req.user.id 
+    });
+    
+    if (!historyItem) {
+      return res.status(404).json({ msg: 'History item not found' });
+    }
+    
+    res.json(historyItem);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'History item not found' });
+    }
     res.status(500).send('Server error');
   }
 });
