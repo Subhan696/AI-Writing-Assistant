@@ -67,10 +67,9 @@ const MainLayout = ({ historyComponent, chatComponent, onNewChat, onHistoryItemC
       <aside 
         className={cn(
           'fixed inset-y-0 left-0 z-30 w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out',
-          'transform',
-          isHistoryOpen ? 'translate-x-0' : '-translate-x-full',
-          'lg:translate-x-0 lg:static lg:z-0',
-          !isHistoryOpen && 'lg:hidden'
+          isMobile ? (isHistoryOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0',
+          'lg:static lg:z-0',
+          isMobile || isHistoryOpen ? 'block' : 'hidden'
         )}
       >
         <div className="h-full flex flex-col">
@@ -98,19 +97,12 @@ const MainLayout = ({ historyComponent, chatComponent, onNewChat, onHistoryItemC
 
       {/* Main Content - Takes full width */}
       <div className="flex-1 flex flex-col h-full w-full overflow-hidden">
-        {/* Header */}
-        <header className="h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center px-4 sticky top-0 z-10">
-          <button 
-            onClick={toggleHistory}
-            className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden"
-            aria-label={isHistoryOpen ? 'Close sidebar' : 'Open sidebar'}
-          >
-            <FiMenu size={20} />
-          </button>
-          <div className="hidden lg:flex items-center space-x-4">
+        {/* Fixed Header - positioned below navbar */}
+        <header className="fixed top-14 left-0 right-0 h-16 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center px-4 z-40">
+          <div className="w-full max-w-7xl mx-auto flex items-center space-x-4">
             <button 
               onClick={toggleHistory}
-              className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               aria-label={isHistoryOpen ? 'Close sidebar' : 'Open sidebar'}
             >
               <FiMenu size={20} />
@@ -122,6 +114,9 @@ const MainLayout = ({ historyComponent, chatComponent, onNewChat, onHistoryItemC
             )}
           </div>
         </header>
+        
+        {/* Spacer to push content below fixed header and navbar */}
+        <div className="h-24 flex-shrink-0"></div>
         
         {/* Chat Area */}
         <div className="flex-1 overflow-hidden">

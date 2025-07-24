@@ -40,34 +40,44 @@ const Chat = ({ chatId, onNewConversation }) => {
   
   // Load conversation when chatId changes
   useEffect(() => {
-    // For now, we'll always start a new conversation since we don't have conversation history yet
-    setConversation({
-      id: null,
-      title: 'New Chat',
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-    
-    // TODO: Implement conversation history loading when backend supports it
-    /*
-    if (chatId) {
-      // Load the conversation from the server
-      const response = await axios.get(`/api/conversations/${chatId}`);
-      if (response.data) {
-        // Convert the server data to our conversation format
-        const serverConversation = response.data;
+    const loadConversation = async () => {
+      if (chatId) {
+        try {
+          // Load the conversation from the server
+          const response = await axios.get(`/api/history/${chatId}`);
+          if (response.data) {
+            // Convert the server data to our conversation format
+            const serverConversation = response.data;
+            setConversation({
+              id: serverConversation._id,
+              title: serverConversation.title || 'Chat',
+              messages: serverConversation.messages || [],
+              createdAt: new Date(serverConversation.createdAt),
+              updatedAt: new Date(serverConversation.updatedAt)
+            });
+            return; // Exit early if we loaded a conversation
+          }
+        } catch (error) {
+          console.error('Error loading conversation:', error);
+          toast.error('Failed to load conversation');
+        }
+      }
+      
+      // If no chatId or failed to load, start a new conversation
+      // but only if we don't have any messages yet (to prevent clearing existing conversation)
+      if (conversation.messages.length === 0) {
         setConversation({
-          id: serverConversation._id,
-          title: serverConversation.title || 'Chat',
-          messages: serverConversation.messages || [],
-          createdAt: new Date(serverConversation.createdAt),
-          updatedAt: new Date(serverConversation.updatedAt)
+          id: null,
+          title: 'New Chat',
+          messages: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
         });
       }
-    }
-    */
-  }, [chatId]);
+    };
+    
+    loadConversation();
+  }, [chatId]); // Only re-run when chatId changes
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
@@ -208,7 +218,7 @@ const Chat = ({ chatId, onNewConversation }) => {
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900">
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 mb-24">
         {conversation.messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center px-4">
             <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
@@ -282,7 +292,7 @@ const Chat = ({ chatId, onNewConversation }) => {
           </>
         )}
       </div>
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <form onSubmit={handleSubmit} className="flex space-x-2 max-w-4xl mx-auto">
           <div className="relative flex-1">
             <input
@@ -290,7 +300,7 @@ const Chat = ({ chatId, onNewConversation }) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Message AI Assistant..."
-              className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-4 pr-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
               disabled={isLoading}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -298,6 +308,10 @@ const Chat = ({ chatId, onNewConversation }) => {
                   handleSubmit(e);
                 }
               }}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="on"
+              spellCheck="true"
             />
             <button 
               type="submit" 
