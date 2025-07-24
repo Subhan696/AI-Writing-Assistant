@@ -1,82 +1,114 @@
-import React, { useState } from 'react';
-import { FiMenu, FiX, FiMessageSquare, FiEdit3, FiClock } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiMenu, FiChevronLeft, FiMessageSquare, FiPlus } from 'react-icons/fi';
 import { cn } from '../../lib/utils';
 import './MainLayout.css';
 
-const MainLayout = ({ children, historyComponent, editorComponent, chatComponent }) => {
-  const [isHistoryOpen, setIsHistoryOpen] = useState(true);
-  const [activeView, setActiveView] = useState('editor'); // 'editor' or 'chat'
+const MainLayout = ({ historyComponent, chatComponent }) => {
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile view
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
 
   const toggleHistory = () => {
     setIsHistoryOpen(!isHistoryOpen);
   };
 
-  return (
-    <div className="main-layout">
-      {/* Sidebar Toggle Button */}
-      <button 
-        onClick={toggleHistory}
-        className="fixed left-4 top-4 z-50 p-2 rounded-full bg-white dark:bg-gray-800 shadow-lg lg:hidden"
-        aria-label={isHistoryOpen ? 'Close sidebar' : 'Open sidebar'}
-      >
-        {isHistoryOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-      </button>
+  // Close history on mobile when clicking outside
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    const handleClickOutside = (event) => {
+      const sidebar = document.querySelector('.sidebar');
+      const toggleButton = document.querySelector('.toggle-sidebar');
+      
+      if (isHistoryOpen && 
+          !sidebar?.contains(event.target) && 
+          !toggleButton?.contains(event.target)) {
+        setIsHistoryOpen(false);
+      }
+    };
 
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isHistoryOpen, isMobile]);
+  
+  const startNewChat = () => {
+    // Handle starting a new chat
+    console.log('Starting new chat');
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden relative">
       {/* Sidebar */}
       <aside 
         className={cn(
-          'fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out transform',
+          'fixed inset-y-0 left-0 z-30 w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out',
+          'transform',
           isHistoryOpen ? 'translate-x-0' : '-translate-x-full',
-          'lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:flex-shrink-0'
+          'lg:translate-x-0 lg:static lg:z-0',
+          !isHistoryOpen && 'lg:hidden'
         )}
       >
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">History</h2>
-        </div>
-        <div className="overflow-y-auto h-[calc(100vh-65px)]">
-          {historyComponent}
+        <div className="h-full flex flex-col">
+          <div className="p-4 flex-shrink-0">
+            <button 
+              onClick={startNewChat}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-sm font-medium rounded-md border border-dashed border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <FiPlus className="h-4 w-4" />
+              <span>New chat</span>
+            </button>
+          </div>
+          <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-2">Recent</h3>
+            <div className="space-y-1">
+              {historyComponent}
+            </div>
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className={cn(
-        'flex-1 transition-all duration-300',
-        isHistoryOpen ? 'lg:ml-64' : 'lg:ml-0'
-      )}>
-        {/* View Toggle */}
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex">
-              <button
-                onClick={() => setActiveView('editor')}
-                className={cn(
-                  'px-4 py-3 text-sm font-medium flex items-center',
-                  activeView === 'editor' 
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' 
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                )}
-              >
-                <FiEdit3 className="mr-2" /> Editor
-              </button>
-              <button
-                onClick={() => setActiveView('chat')}
-                className={cn(
-                  'px-4 py-3 text-sm font-medium flex items-center',
-                  activeView === 'chat' 
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' 
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                )}
-              >
-                <FiMessageSquare className="mr-2" /> AI Assistant
-              </button>
-            </div>
+      <div className={`flex-1 flex flex-col h-full transition-all duration-300 w-full`}>
+        {/* Header */}
+        <header className="h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center px-4 sticky top-0 z-10">
+          <button 
+            onClick={toggleHistory}
+            className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden"
+            aria-label={isHistoryOpen ? 'Close sidebar' : 'Open sidebar'}
+          >
+            <FiMenu size={20} />
+          </button>
+          <div className="hidden lg:flex items-center space-x-4">
+            <button 
+              onClick={toggleHistory}
+              className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              aria-label={isHistoryOpen ? 'Close sidebar' : 'Open sidebar'}
+            >
+              <FiMenu size={20} />
+            </button>
+            {!isHistoryOpen && (
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                Click the menu icon to view history
+              </span>
+            )}
           </div>
+        </header>
+        
+        {/* Chat Area */}
+        <div className="flex-1 overflow-hidden">
+          {chatComponent}
         </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {activeView === 'editor' ? editorComponent : chatComponent}
-        </div>
-      </main>
+      </div>
     </div>
   );
 };

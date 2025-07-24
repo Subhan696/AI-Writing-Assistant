@@ -28,6 +28,7 @@ import {
 } from '../ui/Card';
 import Button from '../ui/Button';
 import Loading from '../ui/Loading';
+import Textarea from '../ui/Textarea';
 import SuggestionItem from './SuggestionItem';
 import './Editor.css';
 
