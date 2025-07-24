@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Document, Packer, Paragraph } from 'docx';
 import { saveAs } from 'file-saver';
@@ -15,10 +15,20 @@ import {
   FiSave,
   FiFileText
 } from 'react-icons/fi';
-import { useAuth } from '../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
 import { generateAPI, shareAPI } from '../../services/api';
 import { useUsage } from '../../hooks/useUsage';
 import { toast } from 'react-hot-toast';
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardContent, 
+  CardFooter 
+} from '../ui/Card';
+import Button from '../ui/Button';
+import Loading from '../ui/Loading';
+import SuggestionItem from './SuggestionItem';
 import './Editor.css';
 
 const Editor = () => {
@@ -38,7 +48,7 @@ const Editor = () => {
   const textareaRef = useRef(null);
   
   // Authentication and usage tracking
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser } = React.useContext(AuthContext);
   const { currentUsage, maxUsage, isPro } = useUsage();
   
   // Calculate remaining usage and percentage
