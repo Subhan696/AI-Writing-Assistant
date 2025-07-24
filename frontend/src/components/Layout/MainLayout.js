@@ -3,7 +3,7 @@ import { FiMenu, FiChevronLeft, FiMessageSquare, FiPlus } from 'react-icons/fi';
 import { cn } from '../../lib/utils';
 import './MainLayout.css';
 
-const MainLayout = ({ historyComponent, chatComponent }) => {
+const MainLayout = ({ historyComponent, chatComponent, onNewChat }) => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -42,8 +42,13 @@ const MainLayout = ({ historyComponent, chatComponent }) => {
   }, [isHistoryOpen, isMobile]);
   
   const startNewChat = () => {
-    // Handle starting a new chat
-    console.log('Starting new chat');
+    if (typeof onNewChat === 'function') {
+      onNewChat();
+    }
+    // Close the sidebar on mobile after starting a new chat
+    if (isMobile) {
+      setIsHistoryOpen(false);
+    }
   };
 
   return (

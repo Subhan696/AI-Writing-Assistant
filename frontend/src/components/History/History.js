@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FiClock, FiFileText } from 'react-icons/fi';
 import './History.css';
 
-const History = () => {
+const History = ({ onNewChat }) => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,6 +25,13 @@ const History = () => {
     return <div>Loading history...</div>;
   }
 
+  // Handle starting a new chat from history item click
+  const handleHistoryItemClick = () => {
+    if (typeof onNewChat === 'function') {
+      onNewChat();
+    }
+  };
+
   return (
     <div className="history-container">
       <div className="history-header">
@@ -41,7 +48,11 @@ const History = () => {
         <div className="history-list-container">
           <ul className="history-list">
             {history.map((item) => (
-              <li key={item._id} className="history-item group">
+              <li 
+                key={item._id} 
+                className="history-item group cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                onClick={handleHistoryItemClick}
+              >
                 <div className="history-item-content">
                   <div className="history-message">
                     <div className="message-text">

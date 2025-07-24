@@ -99,32 +99,14 @@ app.get('/api/auth', auth, async (req, res) => {
   }
 });
 
-// Usage limit middleware
+// Usage limit middleware - now allows unlimited usage for all users
 const usageLimit = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
-    if (user.isPro) {
-      return next(); // Pro users have unlimited usage
-    }
-
-    const today = new Date().setHours(0, 0, 0, 0);
-    const lastUsed = user.lastUsedDate ? new Date(user.lastUsedDate).setHours(0, 0, 0, 0) : null;
-
-    if (lastUsed !== today) {
-      user.dailyUsageCount = 0;
-    }
-
-    if (user.dailyUsageCount >= 5) { // 5 is the daily limit for free users
-      return res.status(429).json({ msg: 'Daily usage limit reached' });
-    }
-
-    user.dailyUsageCount += 1;
-    user.lastUsedDate = new Date();
-    await user.save();
-
+    // No usage limits - all users have unlimited access
     next();
   } catch (err) {
     console.error(err.message);
@@ -143,7 +125,9 @@ const response = await axios.post(
     messages: [
       { role: 'user', content: prompt }
     ],
-    max_tokens: 150
+    max_tokens: 2048,  // Increased from 150 to allow for much longer responses
+    temperature: 0.7,  // Added for better response quality
+    top_p: 1.0,       // Added for better response quality
   },
   {
     headers: {

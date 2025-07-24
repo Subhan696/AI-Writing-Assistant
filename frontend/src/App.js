@@ -17,12 +17,21 @@ import './App.css';
 // Wrapper component to use the useRealtimeSync hook
 const AppContent = () => {
   useRealtimeSync();
+  const [chatKey, setChatKey] = React.useState(0);
+  
+  // Handle new chat creation
+  const handleNewChat = () => {
+    // Force remount the Chat component with a new key
+    setChatKey(prevKey => prevKey + 1);
+  };
   
   // Main chat interface with history sidebar
   const MainApp = () => (
     <MainLayout
-      chatComponent={<Chat />}
-      historyComponent={<History />}
+      key={chatKey}
+      chatComponent={<Chat key={chatKey} />}
+      historyComponent={<History onNewChat={handleNewChat} />}
+      onNewChat={handleNewChat}
     />
   );
 

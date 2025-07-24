@@ -10,18 +10,12 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // All users now have full access
   isPro: {
     type: Boolean,
-    default: false,
+    default: true, // All users are now effectively 'Pro'
   },
-  lastUsedDate: {
-    type: Date,
-    default: null,
-  },
-  dailyUsageCount: {
-    type: Number,
-    default: 0,
-  },
+  // Removed usage tracking fields as they're no longer needed
 });
 
-module.exports = mongoose.model('User', UserSchema); 
+module.exports = mongoose.model('User', UserSchema);

@@ -25,15 +25,7 @@ const Navbar = () => {
   const authLinks = (
     <div className="flex items-center space-x-2">
       <div className="hidden md:flex items-center text-sm text-gray-700 dark:text-gray-300 mr-4">
-        <span className="truncate max-w-[160px]">{user?.email}</span>
-        {user?.isPro && (
-          <span className="ml-2 px-2 py-0.5 bg-green-500 text-white text-xs rounded-full whitespace-nowrap">
-            PRO
-          </span>
-        )}
-        <span className="ml-2 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-          ({user?.dailyUsageCount || 0}/5)
-        </span>
+        <span className="truncate max-w-[200px] font-medium">{user?.email}</span>
       </div>
       <Button
         variant="ghost"

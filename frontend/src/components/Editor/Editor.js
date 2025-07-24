@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Document, Packer, Paragraph } from 'docx';
 import { saveAs } from 'file-saver';
@@ -48,22 +48,8 @@ const Editor = () => {
   const titleInputRef = useRef(null);
   const textareaRef = useRef(null);
   
-  // Authentication and usage tracking
-  const { user, refreshUser } = React.useContext(AuthContext);
-  const { currentUsage, maxUsage, isPro } = useUsage();
-  
-  // Calculate remaining usage and percentage
-  const remaining = Math.max(0, maxUsage - currentUsage);
-  const usagePercentage = Math.min(100, Math.round((currentUsage / maxUsage) * 100));
-
-  // Usage bar color based on usage
-  const usageBarClass = useMemo(() => {
-    const percentage = usagePercentage;
-    if (isPro) return 'bg-gradient-to-r from-green-500 to-emerald-500';
-    if (percentage > 90) return 'bg-gradient-to-r from-red-500 to-pink-500';
-    if (percentage > 70) return 'bg-gradient-to-r from-yellow-500 to-amber-500';
-    return 'bg-gradient-to-r from-blue-500 to-cyan-500';
-  }, [currentUsage, maxUsage, isPro]);
+  // Authentication
+  const { user } = React.useContext(AuthContext);
   
   // Auto-focus textarea on mount
   useEffect(() => {
@@ -78,10 +64,7 @@ const Editor = () => {
       return;
     }
 
-    if (remaining <= 0 && !isPro) {
-      toast.error('Daily limit reached. Upgrade to Pro for unlimited generations.');
-      return;
-    }
+    // All users have unlimited access
 
     setIsGenerating(true);
     setSuggestions([]);
@@ -95,8 +78,7 @@ const Editor = () => {
       setSuggestions(prev => [...prev, response.data.generatedText]);
       toast.success('Text generated successfully!');
       
-      // Refresh user data to update usage count
-      await refreshUser();
+      // No need to refresh user data for usage tracking
     } catch (err) {
       const errorMsg = err.response?.data?.msg || 'Error generating text. Please try again.';
       toast.error(errorMsg);
@@ -231,23 +213,11 @@ const Editor = () => {
             )}
           </div>
           <div className="flex items-center space-x-2">
-            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-              <span className="mr-2">{currentUsage}/{isPro ? '∞' : maxUsage} uses</span>
-              <div className="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <div 
-                  className={`h-full ${usageBarClass} transition-all duration-300`}
-                  style={{ width: `${usagePercentage}%` }}
-                />
-              </div>
+            <div className="text-center py-2">
+              <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                Unlimited generations
+              </p>
             </div>
-            {!isPro && (
-              <button 
-                onClick={() => console.log('Upgrade to Pro')}
-                className="px-3 py-1 text-xs font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 rounded-md transition-all"
-              >
-                Upgrade
-              </button>
-            )}
           </div>
         </div>
       </div>
